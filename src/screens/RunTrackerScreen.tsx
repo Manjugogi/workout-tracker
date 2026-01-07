@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { Colors, Spacing, Typography } from '../theme/theme';
-import { useWorkoutTimer } from '../hooks/useWorkoutTimer'; // Reuse timer purely for display if possible, or just standard interval
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHistoryStore } from '../store/historyStore';
 
 // Haversine formula for distance in meters
@@ -22,6 +22,7 @@ const getDistanceFromLatLonInM = (lat1: number, lon1: number, lat2: number, lon2
 }
 
 export const RunTrackerScreen = () => {
+    const insets = useSafeAreaInsets();
     const [isRunning, setIsRunning] = useState(false);
     const [distance, setDistance] = useState(0); // in meters
     const [duration, setDuration] = useState(0); // in seconds
@@ -93,7 +94,7 @@ export const RunTrackerScreen = () => {
         if (durationInterval.current) clearInterval(durationInterval.current);
         if (locationSubscription.current) locationSubscription.current.remove();
 
-        if (duration > 10) { // Only save if longer than 10 seconds
+        if (duration > 2) { // Only save if longer than 2 seconds
             addLog({
                 type: 'Run',
                 name: 'Outdoor Run',
@@ -123,7 +124,10 @@ export const RunTrackerScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
+        ]}>
             <View style={styles.statsContainer}>
                 <View style={styles.statBox}>
                     <Text style={styles.statLabel}>DISTANCE (km)</Text>

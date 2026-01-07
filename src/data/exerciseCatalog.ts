@@ -6,7 +6,25 @@ export type WorkoutCategory =
     | 'Yoga'
     | 'Mobility'
     | 'Sports'
-    | 'Recovery';
+    | 'Recovery'
+    | 'Pilates'
+    | 'Powerlifting'
+    | 'CrossFit'
+    | 'Calisthenics';
+
+export const CATEGORIES: WorkoutCategory[] = [
+    'Strength',
+    'Cardio',
+    'Functional',
+    'Yoga',
+    'Mobility',
+    'Sports',
+    'Recovery',
+    'Pilates',
+    'Powerlifting',
+    'CrossFit',
+    'Calisthenics',
+];
 
 export type WorkoutType =
     | 'Upper Body' | 'Lower Body' | 'Core' | 'Full Body'
@@ -91,4 +109,32 @@ export const MASTER_EXERCISE_LIST: ExerciseDefinition[] = [
     { id: 'meditation', name: 'Meditation', category: 'Recovery', workout_type: 'Mindfulness', supported_metrics: ['duration_minutes'] },
     { id: 'pranayama', name: 'Pranayama', category: 'Recovery', workout_type: 'Breathwork', supported_metrics: ['duration_minutes'] },
     { id: 'breathing_exercises', name: 'Breathing Exercises', category: 'Recovery', workout_type: 'Breathwork', supported_metrics: ['duration_minutes'] },
+
+    // --- Pilates ---
+    { id: 'pilates_hundred', name: 'The Hundred', category: 'Pilates', workout_type: 'Core', supported_metrics: ['sets', 'reps', 'duration_minutes'] },
+    { id: 'pilates_roll_up', name: 'Roll Up', category: 'Pilates', workout_type: 'Core', supported_metrics: ['sets', 'reps'] },
+    { id: 'pilates_leg_circles', name: 'Leg Circles', category: 'Pilates', workout_type: 'Flexibility', supported_metrics: ['sets', 'reps'] },
+    { id: 'pilates_criss_cross', name: 'Criss Cross', category: 'Pilates', workout_type: 'Core', supported_metrics: ['sets', 'reps'] },
+    { id: 'pilates_swan', name: 'Swan Dive', category: 'Pilates', workout_type: 'Flexibility', supported_metrics: ['sets', 'reps'] },
+
+    // --- Powerlifting ---
+    { id: 'comp_squat', name: 'Competition Squat', category: 'Powerlifting', workout_type: 'Lower Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'comp_bench', name: 'Competition Bench Press', category: 'Powerlifting', workout_type: 'Upper Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'comp_deadlift', name: 'Competition Deadlift', category: 'Powerlifting', workout_type: 'Lower Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'low_bar_squat', name: 'Low Bar Squat', category: 'Powerlifting', workout_type: 'Lower Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'sumo_deadlift', name: 'Sumo Deadlift', category: 'Powerlifting', workout_type: 'Lower Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+
+    // --- CrossFit ---
+    { id: 'wall_balls', name: 'Wall Balls', category: 'CrossFit', workout_type: 'Full Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'thrusters', name: 'Thrusters', category: 'CrossFit', workout_type: 'Full Body', supported_metrics: ['sets', 'reps', 'weight_kg'] },
+    { id: 'box_jumps', name: 'Box Jumps', category: 'CrossFit', workout_type: 'HIIT', supported_metrics: ['sets', 'reps'] },
+    { id: 'double_unders', name: 'Double Unders', category: 'CrossFit', workout_type: 'HIIT', supported_metrics: ['sets', 'reps'] },
+    { id: 'toes_to_bar', name: 'Toes to Bar', category: 'CrossFit', workout_type: 'Core', supported_metrics: ['sets', 'reps'] },
+
+    // --- Calisthenics ---
+    { id: 'muscle_up', name: 'Muscle Up', category: 'Calisthenics', workout_type: 'Upper Body', supported_metrics: ['sets', 'reps'] },
+    { id: 'l_sit', name: 'L-Sit', category: 'Calisthenics', workout_type: 'Core', supported_metrics: ['sets', 'duration_minutes'] },
+    { id: 'handstand_pushup', name: 'Handstand Pushup', category: 'Calisthenics', workout_type: 'Upper Body', supported_metrics: ['sets', 'reps'] },
+    { id: 'front_lever', name: 'Front Lever', category: 'Calisthenics', workout_type: 'Core', supported_metrics: ['sets', 'duration_minutes'] },
+    { id: 'back_lever', name: 'Back Lever', category: 'Calisthenics', workout_type: 'Core', supported_metrics: ['sets', 'duration_minutes'] },
 ];

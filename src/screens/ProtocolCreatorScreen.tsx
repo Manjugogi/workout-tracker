@@ -3,14 +3,16 @@ import { View, Text, TextInput, ScrollView, StyleSheet, Pressable, Alert, Modal,
 import { useProtocolStore, Exercise, ProtocolCategory } from '../store/protocolStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
 import { v4 as uuidv4 } from 'uuid';
-import { MASTER_EXERCISE_LIST, ExerciseDefinition } from '../data/exerciseCatalog';
+import { CATEGORIES, MASTER_EXERCISE_LIST, ExerciseDefinition } from '../data/exerciseCatalog';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
+    const insets = useSafeAreaInsets();
     const { addProtocol, updateProtocol, protocols } = useProtocolStore();
     const protocolId = route.params?.protocolId;
 
     const [name, setName] = useState('');
-    const [category, setCategory] = useState<ProtocolCategory>('Strength');
+    const [category, setCategory] = useState<string>(CATEGORIES[0]);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
 
@@ -58,11 +60,7 @@ export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
 
         // Try to find matching def to set visibility logic
         const match = MASTER_EXERCISE_LIST.find(def => def.name === ex.name);
-        if (match) {
-            setSelectedExerciseDef(match);
-        } else {
-            setSelectedExerciseDef(null); // Custom/Manual exercise
-        }
+        setSelectedExerciseDef(match || null);
     };
 
     const selectExercise = (def: ExerciseDefinition) => {
@@ -167,7 +165,7 @@ export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
                 <View style={styles.section}>
                     <Text style={styles.label}>Category</Text>
                     <View style={styles.chipContainer}>
-                        {(['Strength', 'Cardio', 'Functional', 'HIIT', 'Yoga', 'Mobility', 'Sports', 'Recovery'] as ProtocolCategory[]).map((cat) => (
+                        {CATEGORIES.map((cat: string) => (
                             <Pressable
                                 key={cat}
                                 style={[styles.chip, category === cat && styles.chipActive]}
@@ -326,7 +324,7 @@ export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
                 <View style={{ height: 100 }} />
             </ScrollView>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { paddingBottom: Math.max(Spacing.m, insets.bottom) }]}>
                 <Pressable style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>{protocolId ? 'Update Routine' : 'Save Routine'}</Text>
                 </Pressable>
@@ -348,7 +346,7 @@ export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
                         </View>
                         <FlatList
                             data={availableExercises}
-                            keyExtractor={(item) => item.id}
+                            keyExtractor={(item) => item.name}
                             renderItem={({ item }) => (
                                 <Pressable
                                     style={styles.modalItem}

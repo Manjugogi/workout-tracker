@@ -3,8 +3,10 @@ import { View, Text, FlatList, StyleSheet, Pressable, Alert } from 'react-native
 import { useHistoryStore, WorkoutLog } from '../store/historyStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
 import { format } from 'date-fns';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const HistoryScreen = () => {
+    const insets = useSafeAreaInsets();
     const { logs, clearHistory } = useHistoryStore();
 
     const confirmClear = () => {
@@ -35,7 +37,10 @@ export const HistoryScreen = () => {
     );
 
     return (
-        <View style={styles.container}>
+        <View style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
+        ]}>
             {logs.length === 0 ? (
                 <View style={styles.emptyState}>
                     <Text style={styles.emptyText}>No history yet.</Text>

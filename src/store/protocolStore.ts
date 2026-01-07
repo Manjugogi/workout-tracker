@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
 
 export type ExerciseType = 'Strength' | 'Cardio' | 'Flexibility' | 'HIIT';
-export type ProtocolCategory = 'Strength' | 'Cardio' | 'Functional' | 'HIIT' | 'Yoga' | 'Mobility' | 'Sports' | 'Recovery';
+export type ProtocolCategory = string;
 
 export interface Exercise {
     id: string;

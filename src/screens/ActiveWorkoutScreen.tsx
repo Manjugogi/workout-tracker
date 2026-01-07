@@ -4,10 +4,13 @@ import { useProtocolStore, Protocol, Exercise } from '../store/protocolStore';
 import { useHistoryStore } from '../store/historyStore';
 import { useWorkoutTimer } from '../hooks/useWorkoutTimer';
 import { Colors, Spacing, Typography } from '../theme/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// No separate import needed if it's already at the top or added to react-native imports
 
 type WorkoutStep = 'PREPARE' | 'WORK' | 'REST' | 'FINISHED';
 
 export const ActiveWorkoutScreen = ({ route, navigation }: any) => {
+    const insets = useSafeAreaInsets();
     const { protocolId } = route.params;
     const { protocols } = useProtocolStore();
 
@@ -130,7 +133,10 @@ export const ActiveWorkoutScreen = ({ route, navigation }: any) => {
     const isTimerMode = currentDuration > 0;
 
     return (
-        <View style={styles.container}>
+        <View style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
+        ]}>
             {/* Header Info */}
             <View style={styles.header}>
                 <Text style={styles.stepLabel}>
@@ -185,7 +191,6 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'center',
-        marginTop: Spacing.xl,
     },
     stepLabel: {
         ...Typography.h2,
@@ -236,7 +241,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: Spacing.l,
-        marginBottom: Spacing.xl,
     },
     controlBtn: {
         paddingVertical: Spacing.m,

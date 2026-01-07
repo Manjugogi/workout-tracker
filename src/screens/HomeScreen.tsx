@@ -1,10 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Colors, Spacing, Typography } from '../theme/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const HomeScreen = ({ navigation }: any) => {
+    const insets = useSafeAreaInsets();
     return (
-        <View style={styles.container}>
+        <View style={[
+            styles.container,
+            { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
+        ]}>
             <Text style={Typography.h1}>Workout Tracker</Text>
 
             <View style={styles.menu}>

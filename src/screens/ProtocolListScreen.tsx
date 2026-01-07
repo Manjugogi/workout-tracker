@@ -2,8 +2,10 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { useProtocolStore, Protocol } from '../store/protocolStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ProtocolListScreen = ({ navigation }: any) => {
+    const insets = useSafeAreaInsets();
     const { protocols, deleteProtocol } = useProtocolStore();
 
     const renderItem = ({ item }: { item: Protocol }) => (
@@ -47,7 +49,7 @@ export const ProtocolListScreen = ({ navigation }: any) => {
             )}
 
             <Pressable
-                style={styles.fab}
+                style={[styles.fab, { bottom: Spacing.xl + insets.bottom, right: Spacing.xl + insets.right }]}
                 onPress={() => navigation.navigate('ProtocolCreator')}
             >
                 <Text style={styles.fabText}>+</Text>
@@ -108,8 +110,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: Spacing.xl,
-        right: Spacing.xl,
+        // Bottom and right are now handled dynamically in the component
         width: 56,
         height: 56,
         borderRadius: 28,
