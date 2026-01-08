@@ -24,7 +24,7 @@ interface ProfileState {
     uploadAvatar: (uri: string) => Promise<string>;
 }
 
-const API_URL = 'http://192.168.29.215:5000/api';
+const API_URL = 'https://workout-tracker-l00l.onrender.com/api';
 
 export const useProfileStore = create<ProfileState>()(
     persist(

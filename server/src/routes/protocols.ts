@@ -47,17 +47,29 @@ router.post('/', authenticate, async (req: any, res) => {
             const ex = exercises[i];
             await query(
                 'INSERT INTO exercises (protocol_id, name, type, duration, reps, sets, rest, weight, distance, order_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
-                [protocol.id, ex.name, ex.type, ex.duration, ex.reps, ex.sets, ex.rest, ex.weight, ex.distance, i]
+                [
+                    protocol.id,
+                    ex.name,
+                    ex.type || 'Strength', // Default to Strength if missing
+                    ex.duration ? Math.round(ex.duration) : null,
+                    ex.reps,
+                    ex.sets,
+                    ex.rest,
+                    ex.weight,
+                    ex.distance,
+                    i
+                ]
             );
         }
 
         await query('COMMIT');
         protocol.exercises = exercises;
         res.status(201).json(protocol);
-    } catch (err) {
+    } catch (err: any) {
         await query('ROLLBACK');
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error creating protocol:', err);
+        // Return actual error for debugging
+        res.status(500).json({ error: err.message || 'Server error' });
     }
 });
 

@@ -6,7 +6,7 @@ import { format, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CustomBackButton } from '../components/CustomBackButton';
 
-const API_URL = 'http://192.168.29.215:5000/api';
+const API_URL = 'https://workout-tracker-l00l.onrender.com/api';
 
 export const WorkoutDetailScreen = ({ route }: any) => {
     const { logId } = route.params;

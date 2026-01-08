@@ -34,7 +34,7 @@ interface ProtocolState {
     deleteProtocol: (id: string) => Promise<void>;
 }
 
-const API_URL = 'http://192.168.29.215:5000/api';
+const API_URL = 'https://workout-tracker-l00l.onrender.com/api';
 
 export const useProtocolStore = create<ProtocolState>()(
     persist(
