@@ -2,15 +2,27 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Colors, Spacing, Typography } from '../theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuthStore } from '../store/authStore';
 
 export const HomeScreen = ({ navigation }: any) => {
     const insets = useSafeAreaInsets();
+    const logout = useAuthStore((state) => state.logout);
+    const user = useAuthStore((state) => state.user);
+
     return (
         <View style={[
             styles.container,
             { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
         ]}>
-            <Text style={Typography.h1}>Workout Tracker</Text>
+            <View style={styles.header}>
+                <View>
+                    <Text style={Typography.h1}>Workout Tracker</Text>
+                    <Text style={styles.userText}>{user?.email}</Text>
+                </View>
+                <Pressable onPress={logout} style={styles.logoutButton}>
+                    <Text style={styles.logoutText}>Logout</Text>
+                </Pressable>
+            </View>
 
             <View style={styles.menu}>
                 <Pressable
@@ -46,10 +58,32 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.background,
         padding: Spacing.m,
-        justifyContent: 'center',
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: Spacing.xl,
+        marginTop: Spacing.m,
+    },
+    userText: {
+        ...Typography.caption,
+        color: Colors.textSecondary,
+    },
+    logoutButton: {
+        paddingHorizontal: Spacing.m,
+        paddingVertical: Spacing.s,
+        borderRadius: 8,
+        backgroundColor: Colors.surface,
+        borderWidth: 1,
+        borderColor: Colors.border,
+    },
+    logoutText: {
+        color: Colors.error,
+        fontWeight: 'bold',
+        fontSize: 12,
     },
     menu: {
-        marginTop: Spacing.xl,
         gap: Spacing.m,
     },
     card: {

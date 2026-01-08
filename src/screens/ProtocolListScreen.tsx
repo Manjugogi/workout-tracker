@@ -1,12 +1,20 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { useProtocolStore, Protocol } from '../store/protocolStore';
+import { useAuthStore } from '../store/authStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ProtocolListScreen = ({ navigation }: any) => {
     const insets = useSafeAreaInsets();
-    const { protocols, deleteProtocol } = useProtocolStore();
+    const { protocols, fetchProtocols, deleteProtocol } = useProtocolStore();
+    const token = useAuthStore((state) => state.token);
+
+    React.useEffect(() => {
+        if (token) {
+            fetchProtocols();
+        }
+    }, [token, fetchProtocols]);
 
     const renderItem = ({ item }: { item: Protocol }) => (
         <Pressable
