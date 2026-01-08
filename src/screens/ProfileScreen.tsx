@@ -122,7 +122,7 @@ export const ProfileScreen = () => {
                     <Pressable style={styles.avatarPlaceholder} onPress={pickImage} disabled={uploading}>
                         {avatarUrl ? (
                             <Image
-                                source={{ uri: `http://192.168.29.215:5000${avatarUrl}` }}
+                                source={{ uri: `https://workout-tracker-l00l.onrender.com${avatarUrl}` }}
                                 style={styles.avatarImage}
                             />
                         ) : (

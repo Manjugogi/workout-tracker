@@ -67,7 +67,8 @@ router.post('/', authenticate, async (req: any, res) => {
         console.error('ERROR: Profile update failed.');
         console.error('Message:', err.message);
         console.error('Code:', err.code);
-        res.status(500).json({ error: 'Database error', detail: err.message, code: err.code });
+        // Return actual error for debugging
+        res.status(500).json({ error: err.message || 'Database error', code: err.code });
     }
 });
 
