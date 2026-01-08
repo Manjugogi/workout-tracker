@@ -9,6 +9,8 @@ import { RunTrackerScreen } from '../screens/RunTrackerScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignupScreen } from '../screens/SignupScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
+import { WorkoutDetailScreen } from '../screens/WorkoutDetailScreen';
 import { Colors } from '../theme/theme';
 import { useAuthStore } from '../store/authStore';
 
@@ -30,42 +32,37 @@ const CustomTheme = {
 const AuthNavigator = () => (
     <AuthStack.Navigator
         screenOptions={{
-            headerStyle: { backgroundColor: Colors.surface },
-            headerTintColor: Colors.primary,
-            headerTitleStyle: { fontWeight: 'bold' },
+            headerShown: false
         }}
     >
-        <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <AuthStack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+        <AuthStack.Screen name="Login" component={LoginScreen} />
+        <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
 );
 
 const MainNavigator = () => (
     <Stack.Navigator
         screenOptions={{
-            headerStyle: { backgroundColor: Colors.surface },
-            headerTintColor: Colors.primary,
-            headerTitleStyle: { fontWeight: 'bold' },
+            headerShown: false
         }}
     >
         <Stack.Screen
             name="Home"
             component={HomeScreen}
-            options={{ headerShown: false }}
         />
         <Stack.Screen
             name="Protocols"
             component={ProtocolListScreen}
-            options={{ title: 'My Routines' }}
         />
         <Stack.Screen
             name="ProtocolCreator"
             component={ProtocolCreatorScreen}
-            options={{ title: 'New Routine' }}
         />
-        <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="RunTracker" component={RunTrackerScreen} options={{ title: 'Run Tracker' }} />
-        <Stack.Screen name="History" component={HistoryScreen} options={{ title: 'Log History' }} />
+        <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
+        <Stack.Screen name="RunTracker" component={RunTrackerScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="WorkoutDetail" component={WorkoutDetailScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
 );
 

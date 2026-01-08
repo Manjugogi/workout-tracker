@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Pressable, Alert } from 'react-native';
 import { useHistoryStore, WorkoutLog } from '../store/historyStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+
+import { CustomHeader } from '../components/CustomHeader';
 
 export const HistoryScreen = () => {
     const insets = useSafeAreaInsets();
-    const { logs, clearHistory } = useHistoryStore();
+    const navigation = useNavigation<any>();
+    const { logs, clearHistory, fetchLogs, deleteLog } = useHistoryStore();
+
+    useEffect(() => {
+        fetchLogs();
+    }, []);
 
     const confirmClear = () => {
         Alert.alert(
@@ -20,27 +28,70 @@ export const HistoryScreen = () => {
         );
     };
 
-    const renderItem = ({ item }: { item: WorkoutLog }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{item.name}</Text>
-                <Text style={styles.cardDate}>{format(item.date, 'MMM d, yyyy')}</Text>
-            </View>
-            <View style={styles.statsRow}>
-                <Text style={styles.stat}>{Math.floor(item.duration / 60)}m {item.duration % 60}s</Text>
-                {item.type === 'Run' && (item.distance ?? 0) > 0 && (
-                    <Text style={styles.stat}>{(item.distance! / 1000).toFixed(2)} km</Text>
-                )}
-            </View>
-            <Text style={styles.typeBadge}>{item.type}</Text>
-        </View>
-    );
+    const handleItemPress = (item: WorkoutLog) => {
+        navigation.navigate('WorkoutDetail', { logId: item.id });
+    };
+
+    const renderItem = ({ item }: { item: WorkoutLog }) => {
+        const isRun = item.type === 'Run';
+        const date = item.date ? (typeof item.date === 'string' ? parseISO(item.date) : new Date(item.date)) : new Date();
+
+        // Handle legacy data where duration was used instead of duration_seconds
+        const durationSeconds = item.duration_seconds || (item as any).duration || 0;
+        const distanceMeters = item.distance_meters || (item as any).distance || 0;
+
+        return (
+            <Pressable
+                style={styles.card}
+                onPress={() => handleItemPress(item)}
+            >
+                <View style={[styles.cardAccent, { backgroundColor: isRun ? Colors.primary : Colors.secondary }]} />
+                <View style={styles.cardContent}>
+                    <View style={styles.cardHeader}>
+                        <View>
+                            <Text style={styles.cardTitle}>{item.name}</Text>
+                            <Text style={styles.cardDate}>{format(date, 'EEEE, MMM d • HH:mm')}</Text>
+                        </View>
+                        <View style={styles.typeTag}>
+                            <Text style={styles.typeTagText}>{item.type.toUpperCase()}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.statsRow}>
+                        <View style={styles.statItem}>
+                            <Text style={styles.statValue}>
+                                {Math.floor(durationSeconds / 60)}<Text style={styles.statUnit}>m</Text> {durationSeconds % 60}<Text style={styles.statUnit}>s</Text>
+                            </Text>
+                            <Text style={styles.statLabel}>DURATION</Text>
+                        </View>
+
+                        {isRun && distanceMeters > 0 && (
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>
+                                    {(distanceMeters / 1000).toFixed(2)}<Text style={styles.statUnit}>km</Text>
+                                </Text>
+                                <Text style={styles.statLabel}>DISTANCE</Text>
+                            </View>
+                        )}
+
+                        {item.calories_burned !== undefined && (
+                            <View style={styles.statItem}>
+                                <Text style={styles.statValue}>
+                                    {Math.round(item.calories_burned)}<Text style={styles.statUnit}>kcal</Text>
+                                </Text>
+                                <Text style={styles.statLabel}>BURNED</Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </Pressable>
+        );
+    };
 
     return (
-        <View style={[
-            styles.container,
-            { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }
-        ]}>
+        <View style={styles.container}>
+            <CustomHeader title="Log History" />
+
             {logs.length === 0 ? (
                 <View style={styles.emptyState}>
                     <Text style={styles.emptyText}>No history yet.</Text>
@@ -49,16 +100,17 @@ export const HistoryScreen = () => {
             ) : (
                 <>
                     <View style={styles.headerRow}>
-                        <Text style={styles.headerTitle}>Recent Activity</Text>
+                        <Text style={styles.headerSubtitle}>{logs.length} ACTIVITIES</Text>
                         <Pressable onPress={confirmClear}>
-                            <Text style={styles.clearText}>Clear All</Text>
+                            <Text style={styles.clearText}>CLEAR ALL</Text>
                         </Pressable>
                     </View>
                     <FlatList
                         data={logs}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
-                        contentContainerStyle={styles.listContent}
+                        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
+                        showsVerticalScrollIndicator={false}
                     />
                 </>
             )}
@@ -75,14 +127,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: Spacing.m,
+        paddingHorizontal: Spacing.m,
+        paddingBottom: Spacing.s,
     },
-    headerTitle: {
-        ...Typography.h2,
+    headerSubtitle: {
+        ...Typography.caption,
+        color: Colors.textSecondary,
+        fontWeight: 'bold',
+        letterSpacing: 2,
     },
     clearText: {
         color: Colors.error,
         fontWeight: 'bold',
+        fontSize: 12,
     },
     listContent: {
         padding: Spacing.m,
@@ -105,40 +162,73 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: Colors.surface,
+        borderRadius: 20,
+        overflow: 'hidden',
+        flexDirection: 'row',
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+    },
+    cardAccent: {
+        width: 6,
+    },
+    cardContent: {
+        flex: 1,
         padding: Spacing.m,
-        borderRadius: 12,
-        borderLeftWidth: 4,
-        borderLeftColor: Colors.secondary, // Different color for logs? or logic based
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: Spacing.xs,
+        alignItems: 'flex-start',
+        marginBottom: Spacing.m,
     },
     cardTitle: {
         ...Typography.h3,
         fontSize: 18,
+        color: Colors.text,
+        marginBottom: 2,
     },
     cardDate: {
         ...Typography.caption,
+        color: Colors.textSecondary,
+        fontSize: 12,
+    },
+    typeTag: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    typeTagText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: Colors.textSecondary,
     },
     statsRow: {
         flexDirection: 'row',
-        gap: Spacing.l,
-        marginTop: Spacing.s,
+        justifyContent: 'flex-start',
+        gap: Spacing.xl,
     },
-    stat: {
-        ...Typography.body,
-        fontWeight: 'bold',
-        color: Colors.primary,
+    statItem: {
+        alignItems: 'flex-start',
     },
-    typeBadge: {
-        position: 'absolute',
-        bottom: Spacing.m,
-        right: Spacing.m,
-        ...Typography.caption,
+    statValue: {
+        fontSize: 16,
+        fontWeight: '900',
+        color: Colors.text,
+    },
+    statUnit: {
+        fontSize: 10,
         color: Colors.textSecondary,
-        opacity: 0.5,
-        textTransform: 'uppercase',
+        fontWeight: 'normal',
+    },
+    statLabel: {
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: Colors.textSecondary,
+        marginTop: 2,
+        letterSpacing: 1,
     }
 });

@@ -5,6 +5,7 @@ import { Colors, Spacing, Typography } from '../theme/theme';
 import { v4 as uuidv4 } from 'uuid';
 import { CATEGORIES, MASTER_EXERCISE_LIST, ExerciseDefinition } from '../data/exerciseCatalog';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CustomHeader } from '../components/CustomHeader';
 
 export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
     const insets = useSafeAreaInsets();
@@ -135,20 +136,27 @@ export const ProtocolCreatorScreen = ({ navigation, route }: any) => {
                 name,
                 category,
                 exercises,
-            });
+            })
+                .then(() => navigation.goBack())
+                .catch(err => {
+                    Alert.alert('Update Failed', err.message);
+                });
         } else {
             addProtocol({
                 name,
                 category,
                 exercises,
-            });
+            })
+                .then(() => navigation.goBack())
+                .catch(err => {
+                    Alert.alert('Save Failed', err.message);
+                });
         }
-
-        navigation.goBack();
     };
 
     return (
         <View style={styles.container}>
+            <CustomHeader title={protocolId ? 'Edit Routine' : 'New Routine'} />
             <ScrollView contentContainerStyle={styles.scrollContent}>
 
                 <View style={styles.section}>

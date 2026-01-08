@@ -1,22 +1,8 @@
 import express from 'express';
 import { query } from '../db/index.js';
-import jwt from 'jsonwebtoken';
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
-
-// Middleware to authenticate
-const authenticate = (req: any, res: any, next: any) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token provided' });
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
-};
 
 // Get all protocols for user
 router.get('/', authenticate, async (req: any, res) => {
@@ -83,6 +69,58 @@ router.delete('/:id', authenticate, async (req: any, res) => {
         res.status(204).send();
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Update protocol
+router.put('/:id', authenticate, async (req: any, res) => {
+    const { name, category, exercises } = req.body;
+    const protoId = req.params.id;
+    const userId = req.user.id;
+    console.log(`[DEBUG] PUT Protocol Request: ID='${protoId}' (len: ${protoId?.length}), User='${userId}' (len: ${userId?.length})`);
+
+    try {
+        await query('BEGIN');
+
+        // Check ownership
+        const ownershipCheck = await query(
+            'SELECT id FROM protocols WHERE id = $1 AND user_id = $2',
+            [protoId, userId]
+        );
+
+        console.log(`[DEBUG] Ownership check for ${protoId} returned ${ownershipCheck.rows.length} rows`);
+
+        if (ownershipCheck.rows.length === 0) {
+            await query('ROLLBACK');
+            console.log(`[DEBUG] NOT FOUND: Protocol '${protoId}' does not belong to user '${userId}'`);
+            return res.status(404).json({ error: 'Protocol not found' });
+        }
+
+        // Update protocol metadata
+        await query(
+            'UPDATE protocols SET name = $1, category = $2 WHERE id = $3',
+            [name, category, protoId]
+        );
+
+        // Replace exercises
+        await query('DELETE FROM exercises WHERE protocol_id = $1', [protoId]);
+        console.log(`[DEBUG] Deleted old exercises for ${protoId}`);
+
+        for (let i = 0; i < exercises.length; i++) {
+            const ex = exercises[i];
+            await query(
+                'INSERT INTO exercises (protocol_id, name, type, duration, reps, sets, rest, weight, distance, order_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+                [protoId, ex.name, ex.type, ex.duration, ex.reps, ex.sets, ex.rest, ex.weight, ex.distance, i]
+            );
+        }
+
+        await query('COMMIT');
+        console.log(`[DEBUG] SUCCESS: Protocol ${protoId} updated`);
+        res.json({ id: protoId, name, category, exercises });
+    } catch (err) {
+        await query('ROLLBACK');
+        console.error('[DEBUG] ERROR in PUT /api/protocols:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

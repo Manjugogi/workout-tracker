@@ -5,6 +5,8 @@ import { useAuthStore } from '../store/authStore';
 import { Colors, Spacing, Typography } from '../theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CustomHeader } from '../components/CustomHeader';
+
 export const ProtocolListScreen = ({ navigation }: any) => {
     const insets = useSafeAreaInsets();
     const { protocols, fetchProtocols, deleteProtocol } = useProtocolStore();
@@ -42,6 +44,8 @@ export const ProtocolListScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
+            <CustomHeader title="My Routines" />
+
             {protocols.length === 0 ? (
                 <View style={styles.emptyState}>
                     <Text style={styles.emptyText}>No protocols yet.</Text>
@@ -52,7 +56,7 @@ export const ProtocolListScreen = ({ navigation }: any) => {
                     data={protocols}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 100 }]}
                 />
             )}
 

@@ -30,6 +30,7 @@ interface ProtocolState {
     protocols: Protocol[];
     fetchProtocols: () => Promise<void>;
     addProtocol: (protocol: Omit<Protocol, 'id' | 'createdAt'>) => Promise<void>;
+    updateProtocol: (id: string, protocol: Omit<Protocol, 'id' | 'createdAt'>) => Promise<void>;
     deleteProtocol: (id: string) => Promise<void>;
 }
 
@@ -67,6 +68,26 @@ export const useProtocolStore = create<ProtocolState>()(
                 if (!response.ok) {
                     const data = await response.json();
                     throw new Error(data.error || 'Failed to add protocol');
+                }
+
+                await get().fetchProtocols();
+            },
+            updateProtocol: async (id, protocol) => {
+                const token = useAuthStore.getState().token;
+                if (!token) throw new Error('Not authenticated');
+
+                const response = await fetch(`${API_URL}/protocols/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(protocol),
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to update protocol');
                 }
 
                 await get().fetchProtocols();
